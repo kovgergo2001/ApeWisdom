@@ -2,7 +2,8 @@ import imp
 from kcu import request, kjson
 from typing import List
 from jsoncodable import JSONCodable
-from time import time
+from ktg import Telegram
+import time
 
 class Stonk(JSONCodable):
     def __init__(
@@ -66,9 +67,22 @@ def get_all_stonks() -> List[Stonk]:
 
     return stonks
 
+
+tg = Telegram("5226498764:AAEV7IsM45RShgaXul_dLl3bGyXMaAvUYUc", "-642747173")
+
 while True:
-    get_all_stonks()[1].jsonprint()
+    new_list_24h =  get_all_stonks()
+    rank_climb = new_list_24h[0].rank_24h_ago - new_list_24h[0].rank
+    
+    tg.send(f"Today's most popular stock is {new_list_24h[0].ticker} climbing {rank_climb} rank(s)!")
+    
+    most_rank_stock = new_list_24h[0]
+
+    for stock in new_list_24h:
+        if stock.rank_24h_ago - stock.rank > rank_climb:
+            most_rank_stock = stock
+            rank_climb = stock.rank_24h_ago - stock.rank
+    
+    tg.send(f"Today's most trending stock is {most_rank_stock.ticker} climbing {rank_climb} rank(s)!")
+
     time.sleep(60*5)
-
-
-
